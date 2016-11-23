@@ -48,7 +48,7 @@ func Crawl(url *Url /*ch chan *Url, chFinished chan bool*/) {
 	}()
 
 	if err != nil {
-		fmt.Println("ERROR: Failed to crawl \"" + url.Address + "\"")
+		fmt.Println("ERROR: Failed to crawl \"" + url.Address + "\". Please check the configuration file for mistakes.")
 		return
 	}
 

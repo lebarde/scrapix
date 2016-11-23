@@ -41,9 +41,9 @@ func main() {
 	//chFinished := make(chan bool)
 
 	// Retrieve the urls
-	fmt.Println("Launching requests:")
+	fmt.Println("Launching", len(urls), "requests...")
 	for _, u := range urls {
-		fmt.Println("-", u.Address)
+		//fmt.Println("-", u.Address)
 		go scraplib.Crawl(u /*, chUrls, chFinished*/)
 	}
 
@@ -52,10 +52,11 @@ func main() {
 		//fmt.Println("debug: Range enter")
 		select {
 		case <-u.ChFinished:
+			// Do nothing?
 			//fmt.Println("Found url", u.Address)
-			if !u.Found {
-				fmt.Println("debug: But url.Found = false…")
-			}
+			//if !u.Found {
+			//	fmt.Println("debug: But url.Found = false…")
+			//}
 		}
 	}
 
@@ -74,4 +75,6 @@ func main() {
 
 	// TODO compare inside the database
 	// then show the results.
+	scraplib.DbSearch()
+	fmt.Println("DB done!")
 }
