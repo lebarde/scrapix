@@ -15,43 +15,81 @@ package scraplib
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
+	//"github.com/jinzhu/gorm"
+	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3"
 	//_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
 
 type Page struct {
-	Id           int
-	Url          string `sql:unique`
-	LastModified time.Time
-	Content      string
+	ID        int    //xorm.Model // Adds ID, CreatedAt, UpdatedAt, DeletedAt
+	Url       string `sql:unique`
+	Content   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 }
 
-func DbSearch() {
-	db, err := gorm.Open("sqlite3", "cache.db")
+func DbCheckUrls(urls []*Url) {
+	// Prepare database
+	//db, err := gorm.Open("sqlite3", "$HOME/.cache/scrapix/cache.db")
+	db, err := xorm.NewEngine("sqlite3", GetCacheLocation()+"cache.db")
 	checkErr(err)
 
 	defer db.Close()
 
-	db.LogMode(true)
+	//db.LogMode(true)
+	db.ShowSQL(true)
 
+	fmt.Println("Database location:", GetCacheLocation()+"cache.db")
+
+	// Actions on urls
+	for _, u := range urls {
+		dbCompare(db, u)
+	}
+}
+
+// The database has Pages, and we crawled Urls.
+// This function compares a found Url with the corresponding
+// Page in database.
+func dbCompare(db *xorm.Engine, u *Url) {
+	/*
+	// Test if table exists in the database
 	if !db.HasTable(new(Page)) {
 		fmt.Println("Database Pages did not exist. Creating table \"pages\" in cache.")
 		db.CreateTable(new(Page))
+	}*/
+	db.Sync(new(Page))
+
+	fmt.Println("beep")
+	//pageOne := Page{Url: "http://agreg.org/", Content: "Hello World!"}
+	//pageTwo := Page{Url: "http://www.topologix.fr/sujets/"}
+
+	//db.Save(&pageOne)
+	//db.Save(&pageTwo)
+
+	//db.Where("url = ?", "http://agreg.org/").Find(&somePage)
+	//somePage := Page{Content: "Hello World!"}
+	//has, err := db.Where(&somePage).Get(&somePage)
+
+	var somePages []Page
+	//err = db.Asc("id").Find(&somePages)
+	err := db.Sql("select * from pages").Find(&somePages)
+	
+	if err != nil {
+		fmt.Println("Found", len(somePages), "pages:")
+		fmt.Printf("%#v\n", somePages)
+		for _, p := range somePages {
+			fmt.Println("Content of Page:", p.Url)
+		}
+	} else {
+		fmt.Println("Content not found. Insert things.")
+		page := Page{Url: "helloworld", Content:time.Now().String()}
+		db.Insert(page)
+		fmt.Println("Inserted page:", page.ID)
 	}
 
-	pageOne := Page{Url: "http://agreg.org/", Content: "Hello World!"}
-	pageTwo := Page{Url: "http://www.topologix.fr/sujets/"}
-
-	db.Save(&pageOne)
-	db.Save(&pageTwo)
-
-	var somePage Page
-
-	db.Where("url = ?", "http://agreg.org/").Find(&somePage)
-
-	fmt.Println("Content of Page:", somePage.Content)
 
 	/*
 

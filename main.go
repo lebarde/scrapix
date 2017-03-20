@@ -32,6 +32,7 @@ func main() {
 	// TODO read command line and do actions
 
 	// Read config file and populate data
+	// Data structure is a map of Url - see url.go
 	urls := scraplib.UrlsConfig(scraplib.ReadConfig())
 
 	// TODO check for refresh times
@@ -75,6 +76,7 @@ func main() {
 
 	// TODO compare inside the database
 	// then show the results.
-	scraplib.DbSearch()
+	scraplib.DbCheckUrls(urls)
+	
 	fmt.Println("DB done!")
 }
