@@ -14,12 +14,11 @@
 package main
 
 import (
-	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"runtime"
-	//"github.com/urfave/cli"
-	//"github.com/Sirupsen/logrus"
 
 	"github.com/lebarde/scrapix/scraplib"
+	//"github.com/spf13/cobra"
 )
 
 func main() {
@@ -27,7 +26,7 @@ func main() {
 
 	VERSION := "alpha 1"
 
-	fmt.Println("Scrapix v.", VERSION)
+	log.Debug("Scrapix v.", VERSION)
 
 	// TODO read command line and do actions
 
@@ -35,48 +34,31 @@ func main() {
 	// Data structure is a map of Url - see url.go
 	urls := scraplib.UrlsConfig(scraplib.ReadConfig())
 
-	// TODO check for refresh times
-
-	// Create channels
-	//chUrls := make(chan *scraplib.Url)
-	//chFinished := make(chan bool)
-
 	// Retrieve the urls
-	fmt.Println("Launching", len(urls), "requests...")
+	log.Debug("Launching ", len(urls), " requests...")
 	for _, u := range urls {
-		//fmt.Println("-", u.Address)
 		go scraplib.Crawl(u /*, chUrls, chFinished*/)
 	}
 
 	// Subscribe to all the channels
 	for _, u := range urls {
-		//fmt.Println("debug: Range enter")
 		select {
 		case <-u.ChFinished:
 			// Do nothing?
-			//fmt.Println("Found url", u.Address)
-			//if !u.Found {
-			//	fmt.Println("debug: But url.Found = false…")
-			//}
 		}
 	}
 
 	// We're done! Print the results...
-	fmt.Println("\nFound some urls:")
+	log.Debug("Found some urls:")
 
 	for _, u := range urls {
-		//fmt.Println("(range:",u.Address,")")
 		if u.Found {
-			fmt.Println(" - " + u.Address)
-			//fmt.Print(string(u.Body[:]))
+			log.Debug(" - " + u.Address)
 		}
 	}
 
-	//close(chUrls)
-
 	// TODO compare inside the database
 	// then show the results.
-	scraplib.DbCheckUrls(urls)
-	
-	fmt.Println("DB done!")
+	scraplib.DbUpdateUrls(urls)
+
 }

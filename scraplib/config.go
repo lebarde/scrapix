@@ -14,7 +14,7 @@
 package scraplib
 
 import (
-	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -27,9 +27,9 @@ func ReadConfig() map[string]interface{} {
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {
 		// Handle errors reading the config file
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		// TODO panic ?
+		log.Panic("Fatal error config file: %s \n", err)
 	}
 
-	//fmt.Println("Reading config: ", viper.Get("params"))
 	return viper.GetStringMap("urls")
 }

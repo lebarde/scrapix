@@ -14,10 +14,9 @@
 package scraplib
 
 import (
-	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"golang.org/x/net/html"
 	"net/http"
-	//"strings"
 	"io/ioutil"
 )
 
@@ -48,52 +47,17 @@ func Crawl(url *Url /*ch chan *Url, chFinished chan bool*/) {
 	}()
 
 	if err != nil {
-		fmt.Println("ERROR: Failed to crawl \"" + url.Address + "\". Please check the configuration file for mistakes.")
+		log.Error("Failed to crawl \"" + url.Address + "\". Please check the configuration file for mistakes.")
 		return
 	}
 
 	b := resp.Body
 	defer b.Close() // close Body when the function returns
 
-	//defer io.Copy(url.Body, b) // Copy that to the Url buffer
 	body, err := ioutil.ReadAll(resp.Body)
 	url.Body = body
 	if err != nil {
-		fmt.Println("ERROR: Failed to read \"" + url.Address + "\"")
+		log.Error("Failed to read \"" + url.Address + "\"")
 	}
 	url.Found = true
-	/*
-		z := html.NewTokenizer(b)
-
-		for {
-			tt := z.Next()
-
-			switch {
-			case tt == html.ErrorToken:
-				// End of the document, we're done
-				return
-			case tt == html.StartTagToken:
-				t := z.Token()
-
-				// Check if the token is an <a> tag
-				isAnchor := t.Data == "a"
-				if !isAnchor {
-					continue
-				}
-
-				// Extract the href value, if there is one
-				ok, uAdd := getHref(t)
-				if !ok {
-					continue
-				}
-				url.Address = uAdd
-
-				// Make sure the url begines in http**
-				hasProto := strings.Index(url.Address, "http") == 0
-				if hasProto {
-					ch <- url
-				}
-			}
-		}*/
-	//ch <- url
 }

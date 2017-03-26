@@ -14,10 +14,6 @@
 package scraplib
 
 import (
-//"fmt"
-//"github.com/spf13/viper"
-//"bytes"
-//"strings"
 )
 
 type Url struct {
@@ -42,7 +38,7 @@ func UrlsConfig(urlsConfig map[string]interface{}) []*Url {
 		u := NewUrl()
 		u.Address = address
 
-		// TODO refresh, watch
+		// TODO refresh, watch (from config file)
 
 		urls = append(urls, u)
 	}
