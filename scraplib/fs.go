@@ -14,14 +14,34 @@
 package scraplib
 
 import (
-	"fmt"
-	//"github.com/spf13/afero"
+	log "github.com/Sirupsen/logrus"
+	"github.com/spf13/afero"
 	"os/user"
 	"runtime"
 )
 
+func getFs() afero.Fs {
+	return afero.NewOsFs()
+}
+
 func GetCacheLocation() string {
-	return getHomeLocation()+ ".cache/" + getName() + "/"
+	cacheLocation := getHomeLocation()+ ".cache/" + getName() + "/"
+
+	fs := new(afero.MemMapFs)
+	exists, err := afero.DirExists(fs, cacheLocation)
+	if err != nil {
+		log.Panic("Problem accessing directory " + cacheLocation)
+		panic(err)
+	}
+	if exists {
+		log.Warn("Directory " + cacheLocation + " did not exist, creating.")
+		err = getFs().MkdirAll(cacheLocation, 0755)
+		if err != nil {
+			log.Panic("Problem creating directory " + cacheLocation)
+			panic(err)
+		}
+	}
+	return cacheLocation
 }
 
 func GetConfigLocation() string {
@@ -34,7 +54,7 @@ func getHomeLocation() string {
 	// Get the user's directory
 	usr, err := user.Current()
 	if err != nil {
-		fmt.Println("Fatal: Could not get the user's directory.", err)
+		log.Fatal("Could not get the user's directory.", err)
 	}
 
 	usrDir := usr.HomeDir
