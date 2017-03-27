@@ -26,14 +26,13 @@ func getFs() afero.Fs {
 
 func GetCacheLocation() string {
 	cacheLocation := getHomeLocation()+ ".cache/" + getName() + "/"
-
 	fs := new(afero.MemMapFs)
 	exists, err := afero.DirExists(fs, cacheLocation)
 	if err != nil {
 		log.Panic("Problem accessing directory " + cacheLocation)
 		panic(err)
 	}
-	if exists {
+	if !exists {
 		log.Warn("Directory " + cacheLocation + " did not exist, creating.")
 		err = getFs().MkdirAll(cacheLocation, 0755)
 		if err != nil {

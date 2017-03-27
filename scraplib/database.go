@@ -34,16 +34,17 @@ type Page struct {
 
 func DbUpdateUrls(urls []*Url) {
 	// Prepare database
-	db, err := gorm.Open("sqlite3", GetCacheLocation()+"cache.db")
+	cacheFile := GetCacheLocation()+"cache.db"
+	db, err := gorm.Open("sqlite3", cacheFile)
 	checkErr(err)
 
 	defer db.Close()
 
-	log.Debug("Database location:", GetCacheLocation()+"cache.db")
+	log.Debug("Database location:", cacheFile)
 
 	// Test if table exists in the database
 	if !db.HasTable(&Page{}) {
-		log.Error("Database Pages did not exist. Creating table \"pages\" in cache.")
+		log.Warn("Database Pages did not exist. Creating table \"pages\" in cache.")
 		db.CreateTable(&Page{})
 	}
 	
