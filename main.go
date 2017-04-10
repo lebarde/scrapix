@@ -25,7 +25,6 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	VERSION := "alpha 1"
-
 	log.Debug("Scrapix v.", VERSION)
 
 	// TODO read command line and do actions
@@ -57,8 +56,17 @@ func main() {
 		}
 	}
 
+	db, err := scraplib.InitDatabase()
+	defer db.Close()
+	checkErr(err)
 	// TODO compare inside the database
 	// then show the results.
-	scraplib.DbUpdateUrls(urls)
+	db.DbUpdateUrls(urls)
+	return
+}
 
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
