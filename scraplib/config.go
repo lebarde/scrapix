@@ -25,11 +25,14 @@ func ReadConfig() map[string]interface{} {
 	viper.AddConfigPath(".") // optionally look for config in the working directory
 
 	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {
+  // TODO Test of viper.ConfigFileNotFoundError
+	if serr, ok := err.(*viper.ConfigFileNotFoundError); ok {
+    log.Fatal("Config file not found: ", serr)
+	} else if err != nil {
 		// Handle errors reading the config file
 		// TODO panic ?
-		log.Panic("Fatal error config file: %s \n", err)
-	}
+		log.Fatal("Fatal error config file: ", err)
+  }
 
 	return viper.GetStringMap("urls")
 }
